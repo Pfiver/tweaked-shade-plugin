@@ -51,14 +51,7 @@ public class SimpleFilter
         return jars.contains( jar );
     }
 
-    public boolean isFiltered( String classFile )
-    {
-        String path = normalizePath( classFile );
-
-        return !( isIncluded( path ) && !isExcluded( path ) );
-    }
-
-    private boolean isIncluded( String classFile )
+    public boolean isIncluded( String classFile )
     {
         if ( includes == null || includes.isEmpty() )
         {
@@ -68,7 +61,7 @@ public class SimpleFilter
         return matchPaths( includes, classFile );
     }
 
-    private boolean isExcluded( String classFile )
+    public boolean isExcluded( String classFile )
     {
         if ( excludes == null || excludes.isEmpty() )
         {

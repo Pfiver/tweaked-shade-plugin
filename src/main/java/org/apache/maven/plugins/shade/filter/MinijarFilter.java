@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.vafer.jdependency.Clazz;
 import org.vafer.jdependency.Clazzpath;
 import org.vafer.jdependency.ClazzpathUnit;
+import org.codehaus.plexus.util.SelectorUtils;
 
 /**
  * A filter that prevents the inclusion of classes not required in the final jar.
@@ -52,16 +53,18 @@ public class MinijarFilter
 
     private int classes_removed;
 
-    public MinijarFilter( MavenProject project, Log log )
+    public MinijarFilter( MavenProject project, Set runtimeDependencies, Log log )
         throws IOException
     {
-
+    	
         this.log = log;
 
         Clazzpath cp = new Clazzpath();
 
         ClazzpathUnit artifactUnit =
             cp.addClazzpathUnit( new FileInputStream( project.getArtifact().getFile() ), project.toString() );
+        
+        log.info(String.format("not removing %s", runtimeDependencies));
 
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {
@@ -83,6 +86,13 @@ public class MinijarFilter
         removePackages(artifactUnit);
         removable.removeAll( artifactUnit.getClazzes() );
         removable.removeAll( artifactUnit.getTransitiveDependencies() );
+        
+        for (Object clazz : removable.toArray())
+        	for (Object rd : runtimeDependencies)
+        		if (SelectorUtils.matchPath( ( (String) rd ).replace(".", "/"), ( (Clazz) clazz ).getName().replace(".", "/")))
+        			removable.remove( clazz  );
+//        		if (( (Clazz) clazz ).getName().startsWith( (String) rd ))
+//        			removable.remove( clazz  );
     }
 
     private void removePackages(ClazzpathUnit artifactUnit)
@@ -115,7 +125,7 @@ public class MinijarFilter
         return true;
     }
 
-    public boolean isFiltered( String classFile )
+    public boolean isExcluded( String classFile )
     {
         String className = classFile.replace( '/', '.' ).replaceFirst( "\\.class$", "" );
         Clazz clazz = new Clazz( className );
@@ -129,6 +139,11 @@ public class MinijarFilter
 
         classes_kept += 1;
         return false;
+    }
+    
+    public boolean isIncluded( String classFile )
+    {
+    	return false;
     }
 
     public void finished()

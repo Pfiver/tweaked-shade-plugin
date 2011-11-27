@@ -124,7 +124,7 @@ public class DefaultShader
                     // we cannot allow the jar indexes to be copied over or the
                     // jar is useless. Ideally, we could create a new one
                     // later
-                    continue;
+                    // continue;
                 }
 
                 if ( !entry.isDirectory() && !isFiltered( jarFilters, name ) )
@@ -133,6 +133,7 @@ public class DefaultShader
 
                     String mappedName = remapper.map( name );
 
+                    /*
                     int idx = mappedName.lastIndexOf( '/' );
                     if ( idx != -1 )
                     {
@@ -143,7 +144,8 @@ public class DefaultShader
                             addDirectory( resources, jos, dir );
                         }
                     }
-
+                     */
+                    
                     if ( name.endsWith( ".class" ) )
                     {
                         addRemappedClass( remapper, jos, jar, name, is );
@@ -292,17 +294,23 @@ public class DefaultShader
 
     private boolean isFiltered( List filters, String name )
     {
+    	boolean filtered = false;
         for ( int i = 0; i < filters.size(); i++ )
         {
             Filter filter = (Filter) filters.get( i );
 
-            if ( filter.isFiltered( name ) )
+            if ( filter.isIncluded( name ) )
             {
-                return true;
+            	filtered = false;
+            }
+
+            if ( filter.isExcluded( name ) )
+            {
+            	filtered = true;
             }
         }
 
-        return false;
+        return filtered;
     }
 
     private boolean resourceTransformed( List resourceTransformers, String name, InputStream is, List relocators )

@@ -28,7 +28,8 @@ public interface Filter
 {
     boolean canFilter( File jar );
 
-    boolean isFiltered( String classFile );
+    boolean isIncluded( String classFile );
+    boolean isExcluded( String classFile );
 
     void finished();
 }

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.jar.JarOutputStream;
+import org.codehaus.plexus.util.SelectorUtils;
+
 
 /**
  * A resource processor that prevents the inclusion of an arbitrary
@@ -35,12 +37,11 @@ public class DontIncludeResourceTransformer
     String resource;
 
     public boolean canTransformResource( String r )
-    {
-        if ( r.endsWith( resource ) )
+    {   
+        if ( SelectorUtils.matchPath( resource, r ) )
         {
             return true;
         }
-
         return false;
     }
 

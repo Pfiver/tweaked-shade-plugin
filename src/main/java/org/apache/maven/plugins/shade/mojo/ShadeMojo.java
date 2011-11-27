@@ -355,6 +355,13 @@ public class ShadeMojo
      * @since 1.3
      */
     private File outputFile;
+    
+    /**
+     * Runtime Dependencies - not removed by minimizeJar
+     * 
+     * @parameter
+     */
+    private Set runtimeDependencies;
 
     /** @throws MojoExecutionException  */
     public void execute()
@@ -693,7 +700,7 @@ public class ShadeMojo
 
             try
             {
-                filters.add( new MinijarFilter( project, getLog() ) );
+                filters.add( new MinijarFilter( project, runtimeDependencies, getLog() ) );
             }
             catch ( IOException e )
             {
